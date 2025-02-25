@@ -1,0 +1,52 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags: []
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - 
+  - Water
+  - UI
+  - BoardLayer
+  - CharacterLayer
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: BoardLayer
+    uniqueID: 3649542297
+    locked: 0
+  - name: Default
+    uniqueID: 0
+    locked: 0
+  - name: CharacterLayer
+    uniqueID: 2887333539
+    locked: 0
+  - name: UI
+    uniqueID: 4205909223
+    locked: 0
