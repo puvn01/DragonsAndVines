@@ -8,7 +8,7 @@ public class PlayerController : MonoBehaviour
     public int currentTileIndex = -1;
     public int moveToIndex = -1; 
 
-    public GridManager grid;
+    public GridController grid;
     public bool isMoveAllowed = false;
 
 
@@ -32,18 +32,91 @@ public class PlayerController : MonoBehaviour
     {
         if (isMoveAllowed && currentTileIndex >=0)
         {
-            Move();
+            //Move();
         }
 
     }
 
-    public void Move(Vector2 coordinates)
+    public void JumpToCoord(Vector2 coordinates)
     {
         transform.position = coordinates;
         isMoveAllowed = false;
 
     }
 
+
+
+    //// Smooth movement towards the target position
+    //public IEnumerator MoveToPosition(Vector2 targetPosition)
+    //{
+    //    float journeyTime = moveSpeed;  // Time to move from one tile to another
+    //    float startTime = Time.time;
+    //    Vector2 startPosition = transform.position;
+
+    //    // Smoothly move the player towards the target position using linear interpolation
+    //    while (Time.time - startTime < journeyTime)
+    //    {
+    //        transform.position = Vector2.Lerp(startPosition, targetPosition, (Time.time - startTime) / journeyTime);
+    //        yield return null;  // Wait for the next frame
+    //    }
+
+    //    transform.position = targetPosition;  // Ensure the player reaches the target position at the end
+    //    if ((Vector2)transform.position == targetPosition)
+    //    {
+    //        currentTileIndex = moveToIndex;
+    //        isMoveAllowed = false;
+    //    }
+    //}
+
+
+
+    // Smooth movement towards the target position
+    public IEnumerator MoveToPosition(System.Action checkMoveModifier, bool isModifiedMove=false)
+    {
+
+        isMoveAllowed = false;
+
+        if (!isModifiedMove)
+        {
+            Debug.Log("currentTileIndex: " + currentTileIndex + " ; moveToIndex: " + moveToIndex);
+            //Move to original target position
+            while (currentTileIndex != moveToIndex)
+            {
+                currentTileIndex++;
+
+                while (transform.position != tileList[currentTileIndex].transform.position)
+                {
+                    Debug.Log("Moving from (" + transform.position + ") to (" + tileList[currentTileIndex].transform.position + ")");
+                    transform.position = Vector2.MoveTowards(transform.position, tileList[currentTileIndex].transform.position, moveSpeed * Time.deltaTime);
+                    yield return null;
+                }
+            }
+
+
+        }
+        else
+        {
+            while (transform.position != tileList[moveToIndex].transform.position)
+            {
+                Debug.Log("Moving from (" + transform.position + ") to (" + tileList[moveToIndex].transform.position + ")");
+                transform.position = Vector2.MoveTowards(transform.position, tileList[moveToIndex].transform.position, moveSpeed * Time.deltaTime);
+                yield return null;
+
+            }
+        }
+
+        currentTileIndex = moveToIndex;
+       
+
+        isMoveAllowed = true;
+        checkMoveModifier();
+    }
+
+
+
+
+
+    /*
     public void Move()
     {
         
@@ -59,7 +132,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-    }
+    }*/
 
     public void Scale(Vector2 scaleFactor)
     {

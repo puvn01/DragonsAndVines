@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class GridManager : MonoBehaviour
+public class GridController : MonoBehaviour
 {
     public int rows, cols;
     public TileController tile;
@@ -111,8 +111,8 @@ public class GridManager : MonoBehaviour
     {
 
         Dictionary<int, int> vineDict = new Dictionary<int, int>();
-        vineDict.Add(11, 19);
-        vineDict.Add(22, 34);
+        vineDict.Add(11, 18);
+        vineDict.Add(21, 34);
         vineDict.Add(51, 22);
 
         modifyTile(vineDict);

@@ -6,12 +6,14 @@ public class DiceController : MonoBehaviour
 {
     public int diceValue=0;
     public int playerTurn = 0;
+    public bool isDiceRolled = false;
 
     private void OnMouseDown()
     {
         if (!GameManager.instance.isGameOver)
         {
             Roll();
+            isDiceRolled = true;
         }
         
         
