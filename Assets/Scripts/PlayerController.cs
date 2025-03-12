@@ -21,20 +21,11 @@ public class PlayerController : MonoBehaviour
     {
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
         
-
     }
+
     private void Start()
     {
         tileList = grid._tilesList;
-    }
-
-    private void Update()
-    {
-        if (isMoveAllowed && currentTileIndex >=0)
-        {
-            //Move();
-        }
-
     }
 
     public void JumpToCoord(Vector2 coordinates)
@@ -43,30 +34,6 @@ public class PlayerController : MonoBehaviour
         isMoveAllowed = false;
 
     }
-
-
-
-    //// Smooth movement towards the target position
-    //public IEnumerator MoveToPosition(Vector2 targetPosition)
-    //{
-    //    float journeyTime = moveSpeed;  // Time to move from one tile to another
-    //    float startTime = Time.time;
-    //    Vector2 startPosition = transform.position;
-
-    //    // Smoothly move the player towards the target position using linear interpolation
-    //    while (Time.time - startTime < journeyTime)
-    //    {
-    //        transform.position = Vector2.Lerp(startPosition, targetPosition, (Time.time - startTime) / journeyTime);
-    //        yield return null;  // Wait for the next frame
-    //    }
-
-    //    transform.position = targetPosition;  // Ensure the player reaches the target position at the end
-    //    if ((Vector2)transform.position == targetPosition)
-    //    {
-    //        currentTileIndex = moveToIndex;
-    //        isMoveAllowed = false;
-    //    }
-    //}
 
 
 
@@ -112,28 +79,10 @@ public class PlayerController : MonoBehaviour
         checkMoveModifier();
     }
 
-
-
-
-
-    /*
-    public void Move()
-    {
-        
-        if (currentTileIndex <= tileList.Count - 1)
-        {
-            transform.position = Vector2.MoveTowards(transform.position, tileList[moveToIndex].transform.position, moveSpeed * Time.deltaTime);
-
-            if (transform.position == tileList[moveToIndex].transform.position)
-            {
-                currentTileIndex = moveToIndex;
-                moveToIndex = -1;
-                isMoveAllowed = false;
-            }
-        }
-
-    }*/
-
+    /// <summary>
+    /// Scales the sprite of the Player Object
+    /// </summary>
+    /// <param name="scaleFactor">Percentage of scale to apply</param>
     public void Scale(Vector2 scaleFactor)
     {
         spriteRenderer.transform.localScale = scaleFactor;

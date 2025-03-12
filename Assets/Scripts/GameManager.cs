@@ -33,18 +33,6 @@ public class GameManager : MonoBehaviour
 
         dice.transform.position = new Vector2(grid.transform.localScale.magnitude + 5, grid.transform.localScale.y / 2.0f);
 
-        //if (dice.playerTurn == 1)
-        //{
-        //    if (dice.diceValue == 6 && player.currentTileIndex < 0)
-        //        StartGame();
-        //    else
-        //    {
-        //        //MovePlayer(1);
-
-        //        //MoveModifier();
-
-        //    }
-        //}
 
         if (dice.playerTurn == 1)
         {
@@ -52,7 +40,7 @@ public class GameManager : MonoBehaviour
                 AddCurrentPlayerToBoard();
             else
             {
-                moveCurrentPlayer();
+                MoveCurrentPlayer();
             }
         }
 
@@ -85,7 +73,7 @@ public class GameManager : MonoBehaviour
     }
 
 
-    void moveCurrentPlayer()
+    void MoveCurrentPlayer()
     {
         if (currentPlayer.currentTileIndex < 0)
         {
@@ -98,7 +86,7 @@ public class GameManager : MonoBehaviour
         }
 
         var playerMoveToIndex = currentPlayer.currentTileIndex + dice.diceValue;
-        //var playerMoveToIndex = currentPlayer.currentTileIndex + 1;
+        //var playerMoveToIndex = currentPlayer.currentTileIndex + 1; -- can use for testing to move 1 space at a time
 
 
 
@@ -122,17 +110,20 @@ public class GameManager : MonoBehaviour
 
 
 
-
     }
 
+    //Starts the coroutine for movement
     void MovePlayer(int position, bool isMoveModified=false)
     {
-        //Vector2 targetPosition = GetTilePosition(position);  // Get the target position based on the tile number
         if(currentPlayer.isMoveAllowed)
-            StartCoroutine(currentPlayer.MoveToPosition(applyMoveModifier, isMoveModified));  // Move the player smoothly to the target position
+            StartCoroutine(currentPlayer.MoveToPosition(ApplyMoveModifier, isMoveModified));  // Move the player smoothly to the target position
     }
 
-    void applyMoveModifier()
+    /// <summary>
+    /// Gets the movement modifier (dragon or vine) of the current player's current tile
+    /// and tells the player to move according to the modifier
+    /// </summary>
+    void ApplyMoveModifier()
     {
         int modifier = GetMoveModifier(currentPlayer.currentTileIndex);
         if (modifier != 0)
@@ -150,140 +141,6 @@ public class GameManager : MonoBehaviour
 
     }
 
-    /*
-
-    private void MovePlayer(int moves=0)
-    {
-
-        if (player.currentTileIndex < 0)
-        {
-            return;
-        }
-
-
-
-        //get new position to move to
-        //var playerMoveToIndex = player.currentTileIndex + dice.diceValue;
-        //var playerMoveToIndex = player.currentTileIndex + 1;
-
-        var playerMoveToIndex = player.currentTileIndex + moves;
-
-        if (playerMoveToIndex >= _tilesList.Count - 1)
-        {
-            //Set to Max grid entry
-            playerMoveToIndex = _tilesList.Count - 1;
-
-        }
-
-
-        if (player.isMoveAllowed == false)
-        {
-            //if player stopped moving, check if there is a move modifier on the current tile
-            var moveModifier = GetMoveModifier(player.currentTileIndex);
-            if (moveModifier != 0)
-            {
-                playerMoveToIndex += moveModifier;
-            }
-            else
-            {
-                //reset dice turn
-                dice.playerTurn = 0;
-            }
-
-        }
-
-        //var moveModifier = GetMoveModifier(player.currentTileIndex);
-        //if (moveModifier != 0)
-        //{
-        //    playerMoveToIndex += moveModifier;
-
-        //}
-        //else
-        //{
-        //    isMoveModified = false;
-        //}
-
-
-        //set the new coordinates for the player
-        player.moveToIndex = playerMoveToIndex;
-
-        //tell the player to move
-        player.isMoveAllowed = true;
-
-        if (player.currentTileIndex == _tilesList.Count - 1)
-        {
-            GameOver(true);
-        }
-
-
-
-
-    }
-
-    private void MoveModifier()
-    {
-        Debug.Log("MoveModifier " + isMoveModified + " - " + player.isMoveAllowed);
-
-        if (isMoveModified)
-        {
-            var modifier = GetMoveModifier(player.currentTileIndex);
-            MovePlayer(modifier);
-        }
-
-
-
-
-
-    }
-    */
-
-    /*
-    private IEnumerator MoveModifer()
-    {
-        Debug.Log("InCoRoutine");
-        if (player.isMoveAllowed == false)
-        {
-            var modifier = GetMoveModifier(player.currentTileIndex);
-            player.moveToIndex = player.currentTileIndex + modifier;
-
-
-            //tell the player to move if there was a modifier
-            player.isMoveAllowed = true;
-
-
-        }
-        yield return new WaitForSeconds(0.2f);
-
-    }
-    */
-    /*
-    private IEnumerator MoveModifier(int moveModifier)
-    {
-        
-        //get move modifier
-        //var moveModifier = GetMoveModifier(player.currentTileIndex);
-
-        if (moveModifier != 0)
-        {
-
-            yield return new WaitForSeconds(0.02f);
-            //add any move modifiers
-            player.moveToIndex = player.currentTileIndex + moveModifier;
-
-            dice.playerTurn = 1;
-            //tell the player to move if there was a modifier
-            player.isMoveAllowed = true;
-
-
-        }
-        else
-        {
-            yield return null;
-        }
-
-
-    }*/
-
 
     public void GameOver(bool hasWon)
     {
@@ -294,7 +151,12 @@ public class GameManager : MonoBehaviour
         //Show menu etc.
     }
 
-    public int GetMoveModifier(int TileIndex) 
+    /// <summary>
+    /// Helper method to get the movement modifier of a tile and a specified index
+    /// </summary>
+    /// <param name="TileIndex">Tile index to get the modifier from</param>
+    /// <returns></returns>
+    private int GetMoveModifier(int TileIndex) 
     {
         int modifier = 0;
         if (TileIndex >= _tilesList.Count - 1)
