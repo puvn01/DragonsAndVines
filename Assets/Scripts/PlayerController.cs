@@ -6,10 +6,11 @@ public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 1f;
     public int currentTileIndex = -1;
-    public int moveToIndex = -1; 
+    public int moveToIndex = -1;
+    public string playerName = "Player";
 
     public GridController grid;
-    public bool isMoveAllowed = false;
+    public bool isMoveAllowed = true;
 
 
 
@@ -38,14 +39,13 @@ public class PlayerController : MonoBehaviour
 
 
     // Smooth movement towards the target position
-    public IEnumerator MoveToPosition(System.Action checkMoveModifier, bool isModifiedMove=false)
+    public IEnumerator Move(System.Action checkMoveModifier, bool isModifiedMove=false)
     {
 
         isMoveAllowed = false;
 
         if (!isModifiedMove)
         {
-            Debug.Log("currentTileIndex: " + currentTileIndex + " ; moveToIndex: " + moveToIndex);
             //Move to original target position
             while (currentTileIndex != moveToIndex)
             {
@@ -53,19 +53,16 @@ public class PlayerController : MonoBehaviour
 
                 while (transform.position != tileList[currentTileIndex].transform.position)
                 {
-                    Debug.Log("Moving from (" + transform.position + ") to (" + tileList[currentTileIndex].transform.position + ")");
                     transform.position = Vector2.MoveTowards(transform.position, tileList[currentTileIndex].transform.position, moveSpeed * Time.deltaTime);
                     yield return null;
                 }
             }
-
 
         }
         else
         {
             while (transform.position != tileList[moveToIndex].transform.position)
             {
-                Debug.Log("Moving from (" + transform.position + ") to (" + tileList[moveToIndex].transform.position + ")");
                 transform.position = Vector2.MoveTowards(transform.position, tileList[moveToIndex].transform.position, moveSpeed * Time.deltaTime);
                 yield return null;
 

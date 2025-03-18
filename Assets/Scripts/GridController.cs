@@ -18,7 +18,7 @@ public class GridController : MonoBehaviour
     private SpriteRenderer board;
     [HideInInspector]
     public Vector2 TileScaleFactor;
-    private Dictionary<int, int> dragonDict;
+
 
     private void Awake()
     {
@@ -29,8 +29,8 @@ public class GridController : MonoBehaviour
     {
 
         GenerateGrid();
-        spawnDragon();
-        spawnVine();
+        SpawnDragon();
+        SpawnVine();
     }
 
     private void GenerateGrid()
@@ -46,14 +46,14 @@ public class GridController : MonoBehaviour
             {
                 for (int x = 0; x < cols; x++)
                 {
-                    spawnTile(x, y);
+                    SpawnTile(x, y);
                 }
             }
             else
             {
                 for (int x = cols - 1; x >= 0; x--)
                 {
-                    spawnTile(x, y);
+                    SpawnTile(x, y);
                 }
             }
 
@@ -63,10 +63,9 @@ public class GridController : MonoBehaviour
         board.transform.position = new Vector3(cameraPos.transform.position.x, cameraPos.transform.position.y, board.transform.position.z);
     }
 
-    private void spawnTile(int x, int y)
+    private void SpawnTile(int x, int y)
     {
 
-        // var spawnedTile = Instantiate(tile, new Vector3(x * TileScaleFactor.x, y * TileScaleFactor.y), Quaternion.identity);
         var spawnedTile = Instantiate(tile, this.transform);
         spawnedTile.transform.position = new Vector3(x * TileScaleFactor.x, y * TileScaleFactor.y);
 
@@ -86,41 +85,31 @@ public class GridController : MonoBehaviour
 
     }
 
-    public void spawnDragon()
+    public void SpawnDragon()
     {
         Dictionary<int, int> dragonDict = new Dictionary<int, int>();
-        dragonDict.Add(24, -21);
+        dragonDict.Add(24, -20);
         dragonDict.Add(52, -25);
-        dragonDict.Add(82, -24);
+        dragonDict.Add(82, -23);
 
-        modifyTile(dragonDict);
-
-
-        //var spawnDragon = Instantiate(dragon, this.transform);
-
-        //spawnDragon.transform.position = new Vector3(t.transform.position.x , t.transform.position.y, 0);
-
-        //spawnDragon.name = "Dragon 1";
-        //spawnDragon.Scale(TileScaleFactor);
-        //spawnDragon.moveModifier = -20;
-
+        ModifyTile(dragonDict);
 
     }
 
-    public void spawnVine()
+    public void SpawnVine()
     {
 
         Dictionary<int, int> vineDict = new Dictionary<int, int>();
         vineDict.Add(11, 18);
-        vineDict.Add(21, 34);
-        vineDict.Add(51, 22);
+        vineDict.Add(21, 35);
+        vineDict.Add(51, 21);
 
-        modifyTile(vineDict);
+        ModifyTile(vineDict);
 
 
     }
 
-    public void modifyTile(Dictionary<int,int> dragonVineDict)
+    public void ModifyTile(Dictionary<int,int> dragonVineDict)
     {
         foreach (var coords in dragonVineDict)
         {

@@ -5,7 +5,7 @@ using UnityEngine;
 public class DiceController : MonoBehaviour
 {
     public int diceValue=0;
-    public int playerTurn = 0;
+    public int playerTurn = 1;
     public bool isDiceRolled = false;
 
     private void OnMouseDown()
@@ -23,7 +23,7 @@ public class DiceController : MonoBehaviour
     {
         diceValue = Random.Range(1, 7);
         GameUI.instance.GetDiceRoll(diceValue);
-        playerTurn = 1;
+        
     }
 
  

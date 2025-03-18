@@ -10,11 +10,10 @@ public class GameManager : MonoBehaviour
     public PlayerController currentPlayer;
 
 
-
     public bool isGameOver;
     private List<TileController> _tilesList;
-    private bool isMoveModified;
-    private int playerTurn = 1;
+    private int currentPlayerIndex = 0;
+    private GameObject[] players;
 
     private void Awake()
     {
@@ -24,8 +23,8 @@ public class GameManager : MonoBehaviour
     private void Start()
     {
         _tilesList = grid._tilesList;
-        GameObject[] players = GameObject.FindGameObjectsWithTag("Player"); //Find all players
-        currentPlayer = players[0].GetComponent<PlayerController>();
+        players = GameObject.FindGameObjectsWithTag("Player"); //Find all players
+        currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>();
     }
 
     private void Update()
@@ -33,8 +32,9 @@ public class GameManager : MonoBehaviour
 
         dice.transform.position = new Vector2(grid.transform.localScale.magnitude + 5, grid.transform.localScale.y / 2.0f);
 
+  
 
-        if (dice.playerTurn == 1)
+        if (dice.isDiceRolled && currentPlayer.isMoveAllowed)
         {
             if (dice.diceValue == 6 && currentPlayer.currentTileIndex < 0)
                 AddCurrentPlayerToBoard();
@@ -42,8 +42,8 @@ public class GameManager : MonoBehaviour
             {
                 MoveCurrentPlayer();
             }
+            dice.isDiceRolled = false;
         }
-
 
 
     }
@@ -56,18 +56,12 @@ public class GameManager : MonoBehaviour
         //Add player to board
         currentPlayer.currentTileIndex = 0;
         currentPlayer.moveToIndex = 0;
-
         currentPlayer.Scale(grid.TileScaleFactor);
+
         TileController t = grid.GetTileAtIndex(0);
         Vector2 startPos = t.transform.position;
         currentPlayer.JumpToCoord(startPos);
         
-
-        if (currentPlayer.isMoveAllowed == false)
-        {
-            //reset dice turn
-            dice.playerTurn = 0;
-        }
 
         currentPlayer.isMoveAllowed = true;
     }
@@ -80,13 +74,9 @@ public class GameManager : MonoBehaviour
             return;
         }
 
-        if ((currentPlayer.currentTileIndex == _tilesList.Count - 1))
-        {
-            GameOver(true);
-        }
 
-        var playerMoveToIndex = currentPlayer.currentTileIndex + dice.diceValue;
-        //var playerMoveToIndex = currentPlayer.currentTileIndex + 1; -- can use for testing to move 1 space at a time
+        var playerMoveToIndex= currentPlayer.currentTileIndex + dice.diceValue;
+        //var playerMoveToIndex = currentPlayer.currentTileIndex + 1; // can use for testing to move 1 space at a time
 
 
 
@@ -99,15 +89,10 @@ public class GameManager : MonoBehaviour
 
         currentPlayer.moveToIndex = playerMoveToIndex;
 
-
-        MovePlayer(currentPlayer.moveToIndex);
-
-
-        if (!currentPlayer.isMoveAllowed)
+        if (currentPlayer.isMoveAllowed && dice.isDiceRolled)
         {
-            dice.playerTurn = 0;
+            MovePlayer(currentPlayer.moveToIndex);
         }
-
 
 
     }
@@ -116,24 +101,68 @@ public class GameManager : MonoBehaviour
     void MovePlayer(int position, bool isMoveModified=false)
     {
         if(currentPlayer.isMoveAllowed)
-            StartCoroutine(currentPlayer.MoveToPosition(ApplyMoveModifier, isMoveModified));  // Move the player smoothly to the target position
+            StartCoroutine(currentPlayer.Move(EndMove, isMoveModified));  // Move the player smoothly to the target position
     }
 
     /// <summary>
     /// Gets the movement modifier (dragon or vine) of the current player's current tile
     /// and tells the player to move according to the modifier
     /// </summary>
-    void ApplyMoveModifier()
+    bool ApplyMoveModifier()
     {
+        
         int modifier = GetMoveModifier(currentPlayer.currentTileIndex);
         if (modifier != 0)
         {
+            Debug.Log("Modifier applied: " + modifier);
             currentPlayer.moveToIndex = currentPlayer.currentTileIndex + modifier;
             MovePlayer(modifier,true);
+            return true;
         }
+
+        return false;
     }
 
-    // Convert the current position into a tile position in the world (use your own tile positions)
+
+    /// <summary>
+    /// Checks for any movements that still need to be applied, 
+    /// then checks if end of the board is reached and then switches player
+    /// i.e. 
+    ///     1. Checks if the player is on a dragon/vine and moves the player
+    ///     2. Check if the player has won the game
+    ///     3. Goes to the next player's turn
+    /// 
+    /// </summary>
+    void EndMove()
+    {
+        bool isMoveModified = ApplyMoveModifier();
+        if ((currentPlayer.currentTileIndex == _tilesList.Count - 1))
+        {
+            GameOver(true);
+        }
+
+        if (!isMoveModified)
+        {
+            NextTurn();
+        }
+
+    }
+
+    void NextTurn()
+    {
+        
+        if (dice.diceValue != 6)
+        {
+            Debug.Log("Turn from player " + currentPlayerIndex + " to " + (currentPlayerIndex + 1) % players.Length);
+            currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
+            currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>(); ;
+            dice.playerTurn = currentPlayerIndex+1;
+        }
+     
+
+    }
+
+    // Convert the current position into a tile position in the world (Not currently used - Keep for now)
     Vector2 GetTilePosition(int tileNumber)
     {
         var t = grid.GetTileAtIndex(tileNumber);
@@ -145,7 +174,8 @@ public class GameManager : MonoBehaviour
     public void GameOver(bool hasWon)
     {
         //Win game
-        GameUI.instance.GameOver(hasWon);
+        string winMsg = currentPlayer.playerName + " wins!";
+        GameUI.instance.GameOver(hasWon, winMsg);
         this.isGameOver = true;
         Time.timeScale = 0.0f;
         //Show menu etc.

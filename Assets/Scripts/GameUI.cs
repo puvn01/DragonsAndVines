@@ -24,13 +24,13 @@ public class GameUI : MonoBehaviour
 
     }
 
-    public void GameOver(bool hasWon)
+    public void GameOver(bool hasWon, string winMsg = "You Win!!")
     {
         //Color winTextColor = new Color();
         if (hasWon)
         {
             //winText.color = winTextColor;
-            winText.text = "You Win!!";
+            winText.text = winMsg;
             winText.gameObject.SetActive(true);
         }
         
