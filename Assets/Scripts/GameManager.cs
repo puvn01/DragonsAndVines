@@ -30,19 +30,35 @@ public class GameManager : MonoBehaviour
     private void Update()
     {
 
-        dice.transform.position = new Vector2(grid.transform.localScale.magnitude + 5, grid.transform.localScale.y / 2.0f);
+        dice.transform.position = new Vector2(grid.transform.localScale.magnitude +6, grid.transform.localScale.y / 2.0f);
 
-  
+        //TODO: figure out the computer player dice roll
+        if (currentPlayer.isComputerPlayer)
+        {
+            //dice.Roll();
+            Debug.Log(currentPlayer.name);
+        }
+
 
         if (dice.isDiceRolled && currentPlayer.isMoveAllowed)
         {
-            if (dice.diceValue == 6 && currentPlayer.currentTileIndex < 0)
+
+            if (dice.diceValue == 6 && !currentPlayer.isReady)
+            {
                 AddCurrentPlayerToBoard();
-            else
+            }
+
+            else if (currentPlayer.isReady)
             {
                 MoveCurrentPlayer();
             }
+            else
+            {
+                NextTurn();
+            }
+            
             dice.isDiceRolled = false;
+
         }
 
 
@@ -54,25 +70,20 @@ public class GameManager : MonoBehaviour
             return;
 
         //Add player to board
-        currentPlayer.currentTileIndex = 0;
-        currentPlayer.moveToIndex = 0;
+        currentPlayer.currentTileIndex = -1;
+        currentPlayer.moveToIndex = -1;
         currentPlayer.Scale(grid.TileScaleFactor);
-
-        TileController t = grid.GetTileAtIndex(0);
-        Vector2 startPos = t.transform.position;
-        currentPlayer.JumpToCoord(startPos);
-        
-
+        currentPlayer.JumpToCoord(grid.ReadyArea);
+        currentPlayer.isReady = true;
         currentPlayer.isMoveAllowed = true;
     }
 
 
     void MoveCurrentPlayer()
     {
-        if (currentPlayer.currentTileIndex < 0)
-        {
+
+        if (!currentPlayer.isReady)
             return;
-        }
 
 
         var playerMoveToIndex= currentPlayer.currentTileIndex + dice.diceValue;
@@ -143,22 +154,22 @@ public class GameManager : MonoBehaviour
 
         if (!isMoveModified)
         {
-            NextTurn();
+            if (dice.diceValue != 6)
+            {
+                NextTurn();
+            }
         }
 
     }
 
     void NextTurn()
     {
-        
-        if (dice.diceValue != 6)
-        {
-            Debug.Log("Turn from player " + currentPlayerIndex + " to " + (currentPlayerIndex + 1) % players.Length);
-            currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
-            currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>(); ;
-            dice.playerTurn = currentPlayerIndex+1;
-        }
-     
+
+        Debug.Log("Turn from player " + currentPlayerIndex + " to " + (currentPlayerIndex + 1) % players.Length);
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
+        currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>(); ;
+        dice.playerTurn = currentPlayerIndex + 1;
+
 
     }
 

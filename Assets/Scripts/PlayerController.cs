@@ -8,6 +8,9 @@ public class PlayerController : MonoBehaviour
     public int currentTileIndex = -1;
     public int moveToIndex = -1;
     public string playerName = "Player";
+    public float modifierMoveDelay = 0.15f;
+    public bool isComputerPlayer = false;
+    public bool isReady = false;
 
     public GridController grid;
     public bool isMoveAllowed = true;
@@ -41,7 +44,7 @@ public class PlayerController : MonoBehaviour
     // Smooth movement towards the target position
     public IEnumerator Move(System.Action checkMoveModifier, bool isModifiedMove=false)
     {
-
+        
         isMoveAllowed = false;
 
         if (!isModifiedMove)
@@ -61,6 +64,7 @@ public class PlayerController : MonoBehaviour
         }
         else
         {
+            yield return new WaitForSeconds(modifierMoveDelay);
             while (transform.position != tileList[moveToIndex].transform.position)
             {
                 transform.position = Vector2.MoveTowards(transform.position, tileList[moveToIndex].transform.position, moveSpeed * Time.deltaTime);

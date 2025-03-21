@@ -13,7 +13,6 @@ public class DiceController : MonoBehaviour
         if (!GameManager.instance.isGameOver)
         {
             Roll();
-            isDiceRolled = true;
         }
         
         
@@ -23,7 +22,7 @@ public class DiceController : MonoBehaviour
     {
         diceValue = Random.Range(1, 7);
         GameUI.instance.GetDiceRoll(diceValue);
-        
+        isDiceRolled = true;
     }
 
  

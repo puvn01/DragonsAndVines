@@ -19,6 +19,7 @@ public class GridController : MonoBehaviour
     [HideInInspector]
     public Vector2 TileScaleFactor;
 
+    public Vector2 ReadyArea;
 
     private void Awake()
     {
@@ -35,6 +36,8 @@ public class GridController : MonoBehaviour
 
     private void GenerateGrid()
     {
+        Debug.Log(board.size.x);
+        Debug.Log(board.size.y);
         TileScaleFactor.x = board.size.x / rows;
         TileScaleFactor.y = board.size.y / cols;
 
@@ -61,6 +64,7 @@ public class GridController : MonoBehaviour
         }
         cameraPos.transform.position = new Vector3((rows / 2 - 0.5f) * TileScaleFactor.x, (cols / 2 - 0.5f) * TileScaleFactor.y, cameraPos.transform.position.z);
         board.transform.position = new Vector3(cameraPos.transform.position.x, cameraPos.transform.position.y, board.transform.position.z);
+        ReadyArea = new Vector2(0-TileScaleFactor.x, 0);
     }
 
     private void SpawnTile(int x, int y)
