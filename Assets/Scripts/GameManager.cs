@@ -123,8 +123,6 @@ public class GameManager : MonoBehaviour
             return;
 
         //Add player to board
-        //currentPlayer.currentTileIndex = -1;
-        //currentPlayer.moveToIndex = -1;
         currentPlayer.Scale(grid.TileScaleFactor);
         currentPlayer.JumpToCoord(grid.ReadyArea);
         currentPlayer.isMoveAllowed = true;
@@ -137,11 +135,9 @@ public class GameManager : MonoBehaviour
     void MoveCurrentPlayer()
     {
 
-        if (!currentPlayer.selectedBead.isReady)
+        if (!currentPlayer.IsReady())
             return;
 
-
-        //var playerMoveToIndex= currentPlayer.selectedBead.currentTileIndex + dice.diceValue;
         var playerMoveToIndex = currentPlayer.selectedBead.currentTileIndex + currentPlayer.GetCurrentDiceRoll();
         //var playerMoveToIndex = currentPlayer.currentTileIndex + 1; // can use for testing to move 1 space at a time
 
@@ -152,8 +148,6 @@ public class GameManager : MonoBehaviour
             playerMoveToIndex = _tilesList.Count - 1;
 
         }
-
-        //currentPlayer.moveToIndex = playerMoveToIndex;
 
         //Additional check to see if co-routine is running before moving
         if (currentPlayer.isMoveAllowed && dice.isDiceRolled)
@@ -182,7 +176,6 @@ public class GameManager : MonoBehaviour
         if (modifier != 0)
         {
             Debug.Log("Modifier applied: " + modifier);
-            //currentPlayer.moveToIndex = currentPlayer.currentTileIndex + modifier;
             MovePlayer(modifier,true);
             return true;
         }
@@ -226,9 +219,6 @@ public class GameManager : MonoBehaviour
         currentPlayer.DeselectCurrentBead();
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
         currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>();
-        //dice.playerTurn = currentPlayerIndex + 1;
-        dice.isDiceRolled = false;
-
 
     }
 
@@ -249,6 +239,7 @@ public class GameManager : MonoBehaviour
         this.isGameOver = true;
         Time.timeScale = 0.0f;
         
+        //Log Player move history
         foreach (var player in players)
         {
             var playerController = player.GetComponent<PlayerController>();

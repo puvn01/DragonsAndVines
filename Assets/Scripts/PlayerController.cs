@@ -6,12 +6,9 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour
 {
     public float moveSpeed = 1f;
-    //public int currentTileIndex = -1;
-    //public int moveToIndex = -1;
     public string playerName = "Player";
     public float modifierMoveDelay = 0.15f;
     public bool isComputerPlayer = false;
-    //public bool isReady = false;
 
 
     public GridController grid;
@@ -41,6 +38,7 @@ public class PlayerController : MonoBehaviour
 
     public bool GetSelectedBead()
     {
+        //TODO: Figure out CPU movement
         if (isComputerPlayer)
         {
             Debug.Log("CPU Turn");
@@ -58,8 +56,6 @@ public class PlayerController : MonoBehaviour
             {
                 selectedBead = bead;
                 spriteRenderer = selectedBead.GetComponentInChildren<SpriteRenderer>();
-                //currentTileIndex = bead.currentTileIndex;
-                //isReady = bead.isReady;
                 Debug.Log("Selected Bead: " + bead.name);
                 return true ;
             }
@@ -74,19 +70,12 @@ public class PlayerController : MonoBehaviour
         Debug.Log("Bead Deselected");
     }
 
-    //private void UpdateSelectedBead()
-    //{
-    //    selectedBead.currentTileIndex = currentTileIndex;
-    //    selectedBead.moveToIndex = moveToIndex;
-    //    selectedBead.isReady = isReady;
-    //}
+
 
     public void JumpToCoord(Vector2 coordinates)
     {
         selectedBead.transform.position = coordinates;
         isMoveAllowed = false;
-        //isReady = true;
-        //UpdateSelectedBead();
 
     }
 
@@ -164,7 +153,7 @@ public class PlayerController : MonoBehaviour
     //Populates CurrentDice roll and adds to roll history history
     public void AddDiceRoll(int newDiceValue)
     {
-        Debug.Log("CurrentDiceRoll: " + CurrentDiceRoll);
+        Debug.Log(playerName + "'s current dice roll: " + CurrentDiceRoll);
         CurrentDiceRoll = newDiceValue;
     }
 

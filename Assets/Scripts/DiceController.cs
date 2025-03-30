@@ -13,8 +13,6 @@ public class DiceController : MonoBehaviour
     private void OnMouseDown()
     {
         Roll();
-        
-        
     }
 
     public void Roll()
@@ -30,7 +28,7 @@ public class DiceController : MonoBehaviour
         if (!isDiceRolling)
         {
             isDiceRolling = true;
-            Debug.Log("Rolling dice");
+            //Debug.Log("Rolling dice");
             yield return new WaitForSeconds(0.01f);
             diceValue = Random.Range(1, 7);
             GameUI.instance.GetDiceRoll(diceValue);           

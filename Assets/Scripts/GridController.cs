@@ -36,8 +36,7 @@ public class GridController : MonoBehaviour
 
     private void GenerateGrid()
     {
-        Debug.Log(board.size.x);
-        Debug.Log(board.size.y);
+        Debug.Log("Board Dimensions: x:"+board.size.x+", y:" + board.size.y);
         TileScaleFactor.x = board.size.x / rows;
         TileScaleFactor.y = board.size.y / cols;
 
