@@ -25,30 +25,53 @@ public class GameManager : MonoBehaviour
         _tilesList = grid._tilesList;
         players = GameObject.FindGameObjectsWithTag("Player"); //Find all players
         currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>();
+
+        
     }
 
     private void Update()
     {
 
-        dice.transform.position = new Vector2(grid.transform.localScale.magnitude +6, grid.transform.localScale.y / 2.0f);
+        dice.transform.position = new Vector2(grid.transform.localScale.magnitude + 6, grid.transform.localScale.y / 2.0f);
+
+
+
+        if (GameUI.instance.message != null)
+        {
+            GameUI.instance.GeneralMessage("Current Player Turn: " + currentPlayer.name);
+        }
 
         //TODO: figure out the computer player dice roll
         if (currentPlayer.isComputerPlayer)
         {
-            //dice.Roll();
-            Debug.Log(currentPlayer.name);
+            AutoRoll();
+
+        }
+
+        if (!dice.isDiceRolled)
+        {
+            GameUI.instance.GeneralMessage(currentPlayer.name + " please roll the dice");
+            return;
         }
 
 
+        if (!currentPlayer.GetSelectedBead())
+        {
+            GameUI.instance.GeneralMessage(currentPlayer.name + " please select a bead");
+            return;
+        }
+
         if (dice.isDiceRolled && currentPlayer.isMoveAllowed)
         {
+            if (dice.diceValue > 0)
+                currentPlayer.AddDiceRoll(dice.diceValue);
 
-            if (dice.diceValue == 6 && !currentPlayer.isReady)
+            if (dice.diceValue == 6 && !currentPlayer.IsReady())
             {
                 AddCurrentPlayerToBoard();
             }
 
-            else if (currentPlayer.isReady)
+            else if (currentPlayer.IsReady())
             {
                 MoveCurrentPlayer();
             }
@@ -56,39 +79,71 @@ public class GameManager : MonoBehaviour
             {
                 NextTurn();
             }
-            
             dice.isDiceRolled = false;
+            currentPlayer.AddDiceRollHistory();
 
         }
 
 
     }
 
+    private void AutoRoll()
+    {
+        //Step 1: Roll the Dice
+        /* Conditions:
+         *  - Must be the Computer Player's turn
+         *  - No other player must be moving
+         *  - Current Player's move must be allowed
+         *  - Dice must not be rolled
+         */
+        if (currentPlayer.isMoveAllowed && !dice.isDiceRolled)
+        {
+            dice.Roll();
+        }
+
+        //Step 2: Select a bead
+        /* Conditions:
+         *  - Dice must be rolled
+         *  - No other bead is selected
+         */
+        //if (dice.isDiceRolled)
+        //{
+        //    currentPlayer.GetSelectedBead();
+        //}
+
+        //-> Player bead add to board must be called if correct conditions
+        //-> Player bead must move if correct conditions
+        //-> Player turn ends
+
+
+    }
     private void AddCurrentPlayerToBoard()
     {
         if (dice == null || currentPlayer == null)
             return;
 
         //Add player to board
-        currentPlayer.currentTileIndex = -1;
-        currentPlayer.moveToIndex = -1;
+        //currentPlayer.currentTileIndex = -1;
+        //currentPlayer.moveToIndex = -1;
         currentPlayer.Scale(grid.TileScaleFactor);
         currentPlayer.JumpToCoord(grid.ReadyArea);
-        currentPlayer.isReady = true;
         currentPlayer.isMoveAllowed = true;
+        currentPlayer.selectedBead.isReady = true;
+
+
     }
 
 
     void MoveCurrentPlayer()
     {
 
-        if (!currentPlayer.isReady)
+        if (!currentPlayer.selectedBead.isReady)
             return;
 
 
-        var playerMoveToIndex= currentPlayer.currentTileIndex + dice.diceValue;
+        //var playerMoveToIndex= currentPlayer.selectedBead.currentTileIndex + dice.diceValue;
+        var playerMoveToIndex = currentPlayer.selectedBead.currentTileIndex + currentPlayer.GetCurrentDiceRoll();
         //var playerMoveToIndex = currentPlayer.currentTileIndex + 1; // can use for testing to move 1 space at a time
-
 
 
         if (playerMoveToIndex >= _tilesList.Count - 1)
@@ -98,21 +153,22 @@ public class GameManager : MonoBehaviour
 
         }
 
-        currentPlayer.moveToIndex = playerMoveToIndex;
+        //currentPlayer.moveToIndex = playerMoveToIndex;
 
+        //Additional check to see if co-routine is running before moving
         if (currentPlayer.isMoveAllowed && dice.isDiceRolled)
         {
-            MovePlayer(currentPlayer.moveToIndex);
+            MovePlayer(dice.diceValue);
         }
 
 
     }
 
     //Starts the coroutine for movement
-    void MovePlayer(int position, bool isMoveModified=false)
+    void MovePlayer(int moves, bool isMoveModified=false)
     {
         if(currentPlayer.isMoveAllowed)
-            StartCoroutine(currentPlayer.Move(EndMove, isMoveModified));  // Move the player smoothly to the target position
+            StartCoroutine(currentPlayer.Move(moves, EndMove, isMoveModified));  // Move the player smoothly to the target position
     }
 
     /// <summary>
@@ -122,11 +178,11 @@ public class GameManager : MonoBehaviour
     bool ApplyMoveModifier()
     {
         
-        int modifier = GetMoveModifier(currentPlayer.currentTileIndex);
+        int modifier = GetMoveModifier(currentPlayer.selectedBead.currentTileIndex);
         if (modifier != 0)
         {
             Debug.Log("Modifier applied: " + modifier);
-            currentPlayer.moveToIndex = currentPlayer.currentTileIndex + modifier;
+            //currentPlayer.moveToIndex = currentPlayer.currentTileIndex + modifier;
             MovePlayer(modifier,true);
             return true;
         }
@@ -147,7 +203,7 @@ public class GameManager : MonoBehaviour
     void EndMove()
     {
         bool isMoveModified = ApplyMoveModifier();
-        if ((currentPlayer.currentTileIndex == _tilesList.Count - 1))
+        if ((currentPlayer.selectedBead.currentTileIndex == _tilesList.Count - 1))
         {
             GameOver(true);
         }
@@ -162,13 +218,16 @@ public class GameManager : MonoBehaviour
 
     }
 
+
     void NextTurn()
     {
 
         Debug.Log("Turn from player " + currentPlayerIndex + " to " + (currentPlayerIndex + 1) % players.Length);
+        currentPlayer.DeselectCurrentBead();
         currentPlayerIndex = (currentPlayerIndex + 1) % players.Length;
-        currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>(); ;
-        dice.playerTurn = currentPlayerIndex + 1;
+        currentPlayer = players[currentPlayerIndex].GetComponent<PlayerController>();
+        //dice.playerTurn = currentPlayerIndex + 1;
+        dice.isDiceRolled = false;
 
 
     }
@@ -189,6 +248,20 @@ public class GameManager : MonoBehaviour
         GameUI.instance.GameOver(hasWon, winMsg);
         this.isGameOver = true;
         Time.timeScale = 0.0f;
+        
+        foreach (var player in players)
+        {
+            var playerController = player.GetComponent<PlayerController>();
+            var playerRollHistory = playerController.GetHistoryDiceRoll();
+            string rollHistory = "Player- " + playerController.playerName + ": ";
+
+            foreach (var roll in playerRollHistory)
+            {
+                    rollHistory += roll + ",";
+            }
+            rollHistory = rollHistory.Substring(0, rollHistory.Length - 1);
+            Debug.Log(rollHistory);
+        }
         //Show menu etc.
     }
 

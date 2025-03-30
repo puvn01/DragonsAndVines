@@ -8,22 +8,39 @@ public class DiceController : MonoBehaviour
     public int playerTurn = 1;
     public bool isDiceRolled = false;
 
+
+    private bool isDiceRolling = false;
     private void OnMouseDown()
     {
-        if (!GameManager.instance.isGameOver)
-        {
-            Roll();
-        }
+        Roll();
         
         
     }
 
     public void Roll()
     {
-        diceValue = Random.Range(1, 7);
-        GameUI.instance.GetDiceRoll(diceValue);
-        isDiceRolled = true;
+        if (!GameManager.instance.isGameOver && !isDiceRolled)
+        {
+            StartCoroutine("DiceRoll");
+        }
     }
 
+    public IEnumerator DiceRoll()
+    {
+        if (!isDiceRolling)
+        {
+            isDiceRolling = true;
+            Debug.Log("Rolling dice");
+            yield return new WaitForSeconds(0.01f);
+            diceValue = Random.Range(1, 7);
+            GameUI.instance.GetDiceRoll(diceValue);           
+            isDiceRolling = false;
+            isDiceRolled = !isDiceRolling;
+        }
+
+        
+
+
+    }
  
 }

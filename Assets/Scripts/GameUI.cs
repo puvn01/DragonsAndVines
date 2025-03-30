@@ -8,6 +8,7 @@ public class GameUI : MonoBehaviour
     public static GameUI instance;
     public TextMeshProUGUI diceText;
     public TextMeshProUGUI winText;
+    public TextMeshProUGUI message;
 
 
 
@@ -37,5 +38,8 @@ public class GameUI : MonoBehaviour
 
     }
 
-
+    public void GeneralMessage(string msg)
+    {
+        message.text = msg;
+    }
 }
